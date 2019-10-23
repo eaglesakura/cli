@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/eaglesakura/cli/commons/shell"
-	"golang.org/x/crypto/ssh/terminal"
 	"io/ioutil"
 	"log"
 	"os"
@@ -18,14 +17,17 @@ type GcloudServiceAccount struct {
 
 func main() {
 	keyFile := flag.String("key-file", "", "Service account file path(*.json). example: 'path/to/service-account.json'")
-	accountFromPile := flag.Bool("stdin", false, "Service account file from stdin. example: cat 'path/to/service-account.json' | gcloud-auth --stdin")
+	stdin := flag.Bool("stdin", true, "Service account file from stdin. example: cat 'path/to/service-account.json' | gcloud-auth --stdin")
 
 	flag.Parse()
 
 	var serviceAccountFileBytes []byte
-	if !*accountFromPile {
+	if *stdin {
+		// read json from stdio
+		serviceAccountFileBytes, _ = ioutil.ReadAll(os.Stdin)
+	} else {
 		if *keyFile == "" {
-			log.Fatal("'-key-file' option is invalid\nexample) gcloud-auth -key-file path/to/service-account.json")
+			log.Fatal("invalid '-key-file' option")
 		}
 
 		bytes, err := ioutil.ReadFile(*keyFile)
@@ -33,12 +35,6 @@ func main() {
 			log.Fatalf("read error from '%v'", *keyFile)
 		}
 		serviceAccountFileBytes = bytes
-	} else {
-		// read json from stdio
-		if terminal.IsTerminal(0) {
-			log.Fatal("'stdin' is invalid\nexample) cat 'path/to/service-account.json | gcloud-auth'")
-		}
-		serviceAccountFileBytes, _ = ioutil.ReadAll(os.Stdin)
 	}
 
 	serviceAccount := &GcloudServiceAccount{}

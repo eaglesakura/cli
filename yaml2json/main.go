@@ -1,17 +1,20 @@
 package main
 
 import (
+	"flag"
 	"github.com/ghodss/yaml"
-	"golang.org/x/crypto/ssh/terminal"
 	"io/ioutil"
 	"log"
 	"os"
 )
 
 func main() {
-	// read json from stdio
-	if terminal.IsTerminal(int(os.Stdin.Fd())) {
-		log.Fatal("'stdin' is invalid\nexample) cat 'path/to/yaml | yaml2json'")
+
+	stdin := flag.Bool("stdin", true, "Json parse from stdin buffer, example) 'cat path/to/example.yaml | yaml2json -stdin'")
+	flag.Parse()
+
+	if !*stdin {
+		log.Fatal("invalid '-stdin' option")
 	}
 
 	yamlBytes, _ := ioutil.ReadAll(os.Stdin)
