@@ -1,0 +1,31 @@
+#
+# 1. copy original files.
+#    root/
+#        config.yaml
+#        drawable/
+#                xxhdpi/example.png
+#                ...
+#        mipmap/
+#                xxhdpi/example.png
+#                ...
+# 2. Edit config.yaml file to your project.
+# 3. generate mipmap.
+#    $ genmipmap -input path/to/original/files/dir -output path/to/generation/dir
+#
+requests:
+  - path: android/drawable
+    platform: android
+    type: drawable
+    outpath: dst/Resources
+    format: webp
+    convert_args:
+      - "-quality"
+      - "100"
+  - path: android/mipmap
+    platform: android
+    type: mipmap
+    outpath: ../dst/Resources
+    format: jpg
+    convert_args:
+      - "-quality"
+      - "50"
